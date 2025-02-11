@@ -7,7 +7,6 @@
 TEST(CXMLWriter, WriteEntityTest) {
     CStringDataSink Sink;
     CXMLWriter Writer(Sink);
-
     SXMLEntity Entity;
     Entity.DType = SXMLEntity::EType::StartElement;
     Entity.DNameData = "root";
@@ -17,8 +16,7 @@ TEST(CXMLWriter, WriteEntityTest) {
 
 TEST(CXMLWriter, WriteEntityWithAttributesTest) {
     CStringDataSink Sink;
-    CXMLWriter Writer(Sink);
-
+    CXMLWriter Writer(Sink); 
     SXMLEntity Entity;
     Entity.DType = SXMLEntity::EType::StartElement;
     Entity.DNameData = "root";
@@ -30,7 +28,6 @@ TEST(CXMLWriter, WriteEntityWithAttributesTest) {
 TEST(CXMLWriter, WriteCompleteElementTest) {
     CStringDataSink Sink;
     CXMLWriter Writer(Sink);
-
     SXMLEntity Entity;
     Entity.DType = SXMLEntity::EType::CompleteElement;
     Entity.DNameData = "root";
@@ -41,7 +38,6 @@ TEST(CXMLWriter, WriteCompleteElementTest) {
 TEST(CXMLWriter, WriteTextTest) {
     CStringDataSink Sink;
     CXMLWriter Writer(Sink);
-
     SXMLEntity Entity;
     Entity.DType = SXMLEntity::EType::CharData;
     Entity.DNameData = "Hello, World!";
@@ -53,7 +49,6 @@ TEST(CXMLReader, ReadEntityTest) {
     std::string Input = "<root>";
     CStringDataSource Source(Input);
     CXMLReader Reader(Source);
-
     SXMLEntity Entity;
     EXPECT_TRUE(Reader.ReadEntity(Entity));
     EXPECT_EQ(Entity.DType, SXMLEntity::EType::StartElement);
@@ -64,7 +59,6 @@ TEST(CXMLReader, ReadEntityWithAttributesTest) {
     std::string Input = "<root attr1=\"value1\">";
     CStringDataSource Source(Input);
     CXMLReader Reader(Source);
-
     SXMLEntity Entity;
     EXPECT_TRUE(Reader.ReadEntity(Entity));
     EXPECT_EQ(Entity.DType, SXMLEntity::EType::StartElement);
@@ -78,7 +72,6 @@ TEST(CXMLReader, ReadCompleteElementTest) {
     std::string Input = "<root />";
     CStringDataSource Source(Input);
     CXMLReader Reader(Source);
-
     SXMLEntity Entity;
     EXPECT_TRUE(Reader.ReadEntity(Entity));
     EXPECT_EQ(Entity.DType, SXMLEntity::EType::CompleteElement);
@@ -89,7 +82,6 @@ TEST(CXMLReader, ReadTextTest) {
     std::string Input = "Hello, World!";
     CStringDataSource Source(Input);
     CXMLReader Reader(Source);
-
     SXMLEntity Entity;
     EXPECT_TRUE(Reader.ReadEntity(Entity));
     EXPECT_EQ(Entity.DType, SXMLEntity::EType::CharData);
