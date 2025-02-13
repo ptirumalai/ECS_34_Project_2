@@ -4,7 +4,6 @@
 #include "StringDataSource.h"
 #include "StringDataSink.h"
 
-
 TEST(CDSVWriter, WriteRowTest) {
     CStringDataSink Sink;
     CDSVWriter Writer(Sink, ',');
