@@ -18,6 +18,25 @@ struct CDSVReader::SImplementation{
         return dataSource->End() && leftover.empty();
     }
 
+    bool CheckSpecialCase(std::vector<std::string> &row){
+        for (int i = 0; i < row.size(); i++){
+            // If the first character of the row element is a double quote & the last character of the row element is a double quote
+            if (row[i][0] == '\"' && row[i][row[i].size() - 1] == '\"'){
+                    // Remove the first and last characters of the row element
+                    row[i] = StringUtils::Slice(row[i], 1, -1);
+                    row[i] = StringUtils::Replace(row[i], "\"\"", "\"");
+            }
+            // If the first character of the row element is a double quote
+            else if (row[i][0] == '\"' && row[i][row[i].size() - 1] != '\"'){
+                return false;
+            }
+            else if (row[i][0] != '\"' && row[i][row[i].size() - 1] == '\"'){
+                return false;
+            }
+        }
+        return true;
+    }
+
     bool ReadRow (std::vector<std::string> &row){
         row.clear();
 
@@ -35,6 +54,12 @@ struct CDSVReader::SImplementation{
             // Remove the first element of the leftover vector
             leftover.erase(leftover.begin());
 
+            // If there is an issue with the special case, return false
+            if (!CheckSpecialCase(row)){
+                return false;
+            }
+
+            // Otherwise, return true
             return true;
         }
         
@@ -50,8 +75,16 @@ struct CDSVReader::SImplementation{
             // Split the string by newline after adding any previous leftover elements
             std::vector<std::string> temp = StringUtils::Split(leftover[0] + str, "\n");
 
+            // Remove the first element of the leftover vector
+            leftover.clear();
+
             // Split the first element of the temp vector by the delimiter
             row = StringUtils::Split(temp[0], delim);
+
+            // If there is an issue with the special case, return false
+            if (!CheckSpecialCase(row)){
+                return false;
+            }
 
             // If the temp vector has more than one element, add the remaining elements to the leftover vector
             if (temp.size() > 1){
