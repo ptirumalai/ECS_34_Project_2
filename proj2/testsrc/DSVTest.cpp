@@ -49,7 +49,7 @@ TEST(CDSVReader, ReadRowTest) {
 
     std::vector<std::string> Row;
     EXPECT_TRUE(Reader.ReadRow(Row));
-    EXPECT_EQ(Row.size(), 3);
+    EXPECT_EQ(Row.size(), size_t(3));
     EXPECT_EQ(Row[0], "value1");
     EXPECT_EQ(Row[1], "value2");
     EXPECT_EQ(Row[2], "value3");
@@ -75,7 +75,7 @@ TEST(CDSVReader, ReadEmptyRowTest) {
 
     std::vector<std::string> Row;
     EXPECT_TRUE(Reader.ReadRow(Row));
-    EXPECT_EQ(Row.size(), 0);
+    EXPECT_EQ(Row.size(), size_t(0));
 }
 
 TEST(CDSVReader, ReadMultipleRowsTest) {
