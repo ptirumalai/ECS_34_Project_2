@@ -19,7 +19,7 @@ struct CDSVReader::SImplementation{
     }
 
     bool CheckSpecialCase(std::vector<std::string> &row){
-        for (int i = 0; i < row.size(); i++){
+        for (size_t i = 0; i < row.size(); i++){
             // If the first character of the row element is a double quote & the last character of the row element is a double quote
             if (row[i][0] == '\"' && row[i][row[i].size() - 1] == '\"'){
                     // Remove the first and last characters of the row element
@@ -49,7 +49,7 @@ struct CDSVReader::SImplementation{
         // If the leftover vector has multiple elements, then return the first row element without reading from the data source
         if (leftover.size() > 1){
             // Split the first element of the leftover vector by the delimiter
-            row = StringUtils::Split(leftover[0], delim);
+            row = StringUtils::Split(leftover[0], std::string(1, delim));
 
             // Remove the first element of the leftover vector
             leftover.erase(leftover.begin());
@@ -79,7 +79,7 @@ struct CDSVReader::SImplementation{
             leftover.clear();
 
             // Split the first element of the temp vector by the delimiter
-            row = StringUtils::Split(temp[0], delim);
+            row = StringUtils::Split(temp[0], std::string(1, delim));
 
             // If there is an issue with the special case, return false
             if (!CheckSpecialCase(row)){

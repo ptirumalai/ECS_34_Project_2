@@ -4,70 +4,96 @@
 #include "StringDataSource.h"
 #include "StringDataSink.h"
 
+// Tests for CDSVWriter
 TEST(CDSVWriter, WriteRowTest) {
-    CStringDataSink Sink;
+    auto Sink = std::make_shared<CStringDataSink>();
     CDSVWriter Writer(Sink, ',');
-    std::vector<std::string> Row = {"abc", "def", "ghi"};
+
+    std::vector<std::string> Row = {"value1", "value2", "value3"};
     EXPECT_TRUE(Writer.WriteRow(Row));
-    EXPECT_EQ(Sink.String(), "abc,def,ghi\n");
+    EXPECT_EQ(Sink->String(), "value1,value2,value3\n");
 }
 
 TEST(CDSVWriter, WriteRowWithQuotesTest) {
-    CStringDataSink Sink;
+    auto Sink = std::make_shared<CStringDataSink>();
     CDSVWriter Writer(Sink, ',');
-    std::vector<std::string> Row = {"abc", "de,f", "ghi"};
+
+    std::vector<std::string> Row = {"value,1", "value\"2", "value\n3"};
     EXPECT_TRUE(Writer.WriteRow(Row));
-    EXPECT_EQ(Sink.String(), "abc,\"de,f\",ghi\n");
+    EXPECT_EQ(Sink->String(), "\"value,1\",\"value\"\"2\",\"value\n3\"\n");
 }
 
-TEST(CDSVWriter, WriteRowWithDoubleQuotesTest) {
-    CStringDataSink Sink;
-    CDSVWriter Writer(Sink, ',');
-    std::vector<std::string> Row = {"abc", "de\"f", "ghi"};
+TEST(CDSVWriter, WriteRowWithQuoteAllTest) {
+    auto Sink = std::make_shared<CStringDataSink>();
+    CDSVWriter Writer(Sink, ',', true); // quoteall = true
+
+    std::vector<std::string> Row = {"value1", "value2", "value3"};
     EXPECT_TRUE(Writer.WriteRow(Row));
-    EXPECT_EQ(Sink.String(), "abc,\"de\"\"f\",ghi\n");
+    EXPECT_EQ(Sink->String(), "\"value1\",\"value2\",\"value3\"\n");
 }
 
 TEST(CDSVWriter, WriteEmptyRowTest) {
-    CStringDataSink Sink;
+    auto Sink = std::make_shared<CStringDataSink>();
     CDSVWriter Writer(Sink, ',');
+
     std::vector<std::string> Row = {};
     EXPECT_TRUE(Writer.WriteRow(Row));
-    EXPECT_EQ(Sink.String(), "\n");
+    EXPECT_EQ(Sink->String(), "\n");
 }
 
+// Tests for CDSVReader
 TEST(CDSVReader, ReadRowTest) {
-    std::string Input = "abc,def,ghi\n";
-    CStringDataSource Source(Input);
+    std::string Input = "value1,value2,value3\n";
+    auto Source = std::make_shared<CStringDataSource>(Input);
     CDSVReader Reader(Source, ',');
+
     std::vector<std::string> Row;
     EXPECT_TRUE(Reader.ReadRow(Row));
-    EXPECT_EQ(Row, (std::vector<std::string>{"abc", "def", "ghi"}));
+    EXPECT_EQ(Row.size(), 3);
+    EXPECT_EQ(Row[0], "value1");
+    EXPECT_EQ(Row[1], "value2");
+    EXPECT_EQ(Row[2], "value3");
 }
 
 TEST(CDSVReader, ReadRowWithQuotesTest) {
-    std::string Input = "abc,\"de,f\",ghi\n";
-    CStringDataSource Source(Input);
+    std::string Input = "\"value,1\",\"value\"\"2\",\"value\n3\"\n";
+    auto Source = std::make_shared<CStringDataSource>(Input);
     CDSVReader Reader(Source, ',');
-    std::vector<std::string> Row;
-    EXPECT_TRUE(Reader.ReadRow(Row));
-    EXPECT_EQ(Row, (std::vector<std::string>{"abc", "de,f", "ghi"}));
-}
 
-TEST(CDSVReader, ReadRowWithDoubleQuotesTest) {
-    std::string Input = "abc,\"de\"\"f\",ghi\n";
-    CStringDataSource Source(Input);
-    CDSVReader Reader(Source, ',');
     std::vector<std::string> Row;
     EXPECT_TRUE(Reader.ReadRow(Row));
-    EXPECT_EQ(Row, (std::vector<std::string>{"abc", "de\"f", "ghi"}));
+    EXPECT_EQ(Row.size(), 3);
+    EXPECT_EQ(Row[0], "value,1");
+    EXPECT_EQ(Row[1], "value\"2");
+    EXPECT_EQ(Row[2], "value\n3");
 }
 
 TEST(CDSVReader, ReadEmptyRowTest) {
     std::string Input = "\n";
-    CStringDataSource Source(Input);
+    auto Source = std::make_shared<CStringDataSource>(Input);
     CDSVReader Reader(Source, ',');
+
     std::vector<std::string> Row;
     EXPECT_TRUE(Reader.ReadRow(Row));
-    EXPECT_TRUE(Row.empty());
+    EXPECT_EQ(Row.size(), 0);
+}
+
+TEST(CDSVReader, ReadMultipleRowsTest) {
+    std::string Input = "value1,value2,value3\nvalue4,value5,value6\n";
+    auto Source = std::make_shared<CStringDataSource>(Input);
+    CDSVReader Reader(Source, ',');
+
+    std::vector<std::string> Row1, Row2;
+    EXPECT_TRUE(Reader.ReadRow(Row1));
+    EXPECT_TRUE(Reader.ReadRow(Row2));
+
+    EXPECT_EQ(Row1.size(), 3);
+    EXPECT_EQ(Row1[0], "value1");
+    EXPECT_EQ(Row1[1], "value2");
+    EXPECT_EQ(Row1[2], "value3");
+
+    EXPECT_EQ(Row2.size(), 3);
+    EXPECT_EQ(Row2[0], "value4");
+    EXPECT_EQ(Row2[1], "value5");
+    EXPECT_EQ(Row2[2], "value6");
 }
