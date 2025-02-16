@@ -130,10 +130,11 @@ testxml: obj/XMLReader.o obj/XMLWriter.o obj/XMLTest.o obj/StringUtils.o obj/Str
 
 clean:
 	rm -rf obj bin
+	rm -f teststrutils teststrdatasource teststrdatasink testdsv testxml
 
 run: teststrutils teststrdatasource teststrdatasink testdsv testxml
+	./testdsv
+	./testxml
 	./teststrutils
 	./teststrdatasource
 	./teststrdatasink
-	./testdsv
-	./testxml

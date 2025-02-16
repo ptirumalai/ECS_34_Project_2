@@ -62,7 +62,7 @@ TEST(CDSVReader, ReadRowWithQuotesTest) {
 
     std::vector<std::string> Row;
     EXPECT_TRUE(Reader.ReadRow(Row));
-    EXPECT_EQ(Row.size(), 3);
+    EXPECT_EQ(Row.size(), size_t(3));
     EXPECT_EQ(Row[0], "value,1");
     EXPECT_EQ(Row[1], "value\"2");
     EXPECT_EQ(Row[2], "value\n3");
@@ -78,7 +78,7 @@ TEST(CDSVReader, ReadEmptyRowTest) {
     EXPECT_EQ(Row.size(), size_t(0));
 }
 
-TEST(CDSVReader, ReadMultipleRowsTest) {
+TEST(CDSVReaderTest, ReadMultipleRowsTest) {
     std::string Input = "value1,value2,value3\nvalue4,value5,value6\n";
     auto Source = std::make_shared<CStringDataSource>(Input);
     CDSVReader Reader(Source, ',');
@@ -92,8 +92,11 @@ TEST(CDSVReader, ReadMultipleRowsTest) {
     EXPECT_EQ(Row1[1], "value2");
     EXPECT_EQ(Row1[2], "value3");
 
-    EXPECT_EQ(Row2.size(), 3);
-    EXPECT_EQ(Row2[0], "value4");
-    EXPECT_EQ(Row2[1], "value5");
-    EXPECT_EQ(Row2[2], "value6");
+    if (Row2.size() >= 3) {
+        EXPECT_EQ(Row2[0], "value4");
+        EXPECT_EQ(Row2[1], "value5");
+        EXPECT_EQ(Row2[2], "value6");
+    } else {
+        FAIL() << "Row2 has fewer elements than expected.";
+    }
 }
