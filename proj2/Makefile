@@ -132,7 +132,7 @@ clean:
 	rm -rf obj bin
 	rm -f teststrutils teststrdatasource teststrdatasink testdsv testxml
 
-run: teststrutils teststrdatasource teststrdatasink testdsv testxml
+run d: teststrutils teststrdatasource teststrdatasink testdsv testxml
 	./testdsv
 	./testxml
 	./teststrutils
