@@ -51,40 +51,42 @@ struct CDSVReader::SImplementation {
         // Define an empty character vector
         std::vector<char> buf;
 
-        while(!DataSource->End()){
+        while(!End()){
             char ch;
             char next_ch;
             if (DataSource->Get(ch)){
-                if (ch == '\"' && next_ch != '\"') {    
-                    InQuotes = !InQuotes;
-                }
-                else if (InQuotes && ch == '\"' && next_ch == '\"') {
-                    buf.push_back(ch);
-                    buf.push_back(next_ch);
-                    DataSource->Get(next_ch);
-                }
-                // If the character is a newline character and not in quotes, break
-                else if (ch == '\n' && !InQuotes){
-                    break;
-                } 
-                // If the character is a carriage return character, then check if the next character is a newline character
-                if (ch == '\r' && !InQuotes){
-                    if (DataSource->Peek(next_ch)){
-                        if (next_ch == '\n'){
-                            DataSource->Get(next_ch);
-                        }
+                if (DataSource->Peek(next_ch)){
+                    if (ch == '\"' && next_ch != '\"') {    
+                        InQuotes = !InQuotes;
                     }
-                    break;
+                    else if (InQuotes && ch == '\"' && next_ch == '\"') {
+                        buf.push_back(ch);
+                        buf.push_back(next_ch);
+                        DataSource->Get(next_ch);
+                    }
+                    // If the character is a newline character and not in quotes, break
+                    else if (ch == '\n' && !InQuotes){
+                        break;
+                    } 
+                    // If the character is a carriage return character, then check if the next character is a newline character
+                    if (ch == '\r' && !InQuotes){
+                        if (DataSource->Peek(next_ch)){
+                            if (next_ch == '\n'){
+                                DataSource->Get(next_ch);
+                            }
+                        }
+                        break;
+                    }
                 }
             };
             // This works because we're making a copy of the character to add to buf
             buf.push_back(ch);
-            }
+        }
 
         // Define a string variable to store the data read from the data source
         std::string data(buf.begin(), buf.end());
-
         SplitRow(row, data, Delimiter);
+        return true;
     }
 };
 
