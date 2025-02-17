@@ -30,3 +30,8 @@ TEST(StringDataSink, WriteTest){
     EXPECT_TRUE(Sink.Write(TempVector2));
     EXPECT_EQ(Sink.String(),"Hello World");   
 }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

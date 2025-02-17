@@ -132,9 +132,23 @@ clean:
 	rm -rf obj bin
 	rm -f teststrutils teststrdatasource teststrdatasink testdsv testxml
 
-run d: teststrutils teststrdatasource teststrdatasink testdsv testxml
+run: teststrutils teststrdatasource teststrdatasink testdsv testxml
 	./testdsv
 	./testxml
 	./teststrutils
 	./teststrdatasource
 	./teststrdatasink
+
+# SOURCES=$(shell find . -name "*.cpp")
+# OBJECTS=$(SOURCES:%.cpp=%.o)
+# TARGET=foo
+
+# .PHONY: all
+# all: $(TARGET)
+
+# $(TARGET): $(OBJECTS)
+# 	$(LINK.cpp) $^ -Iinclude $(LOADLIBES) $(LDLIBS) -o $@
+
+# .PHONY: clean
+# clean:
+# 	rm -f $(TARGET) $(OBJECTS)

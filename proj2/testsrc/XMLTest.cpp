@@ -61,3 +61,8 @@ TEST(CXMLReaderTest, ReadEntityWithAttributesTest) {
     EXPECT_EQ(Entity.DAttributes[0].first, "attr1");
     EXPECT_EQ(Entity.DAttributes[0].second, "value1");
 }
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
