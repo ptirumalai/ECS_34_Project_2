@@ -53,32 +53,43 @@ struct CDSVReader::SImplementation {
         char next_ch;
         while(!End()){
             if (DataSource->Get(ch)){
-                if (ch == '\"') {    
-                    InQuotes = !InQuotes;
-                }
-                if (DataSource->Peek(next_ch)){
-                    // If the character is a carriage return character, then check if the next character is a newline character. 
-                    // If so, add it to the buffer to ensure expected behavior for next row read.
-                    if (ch == '\r' && !InQuotes){
+                if (DataSource->Peek(next_ch)){    
+                    if (ch == '\"' && !InQuotes){
+                        InQuotes = !InQuotes;
+                        buf.push_back(ch);
+                    }
+                    else if (ch == '\"' && next_ch == Delimiter && InQuotes){
+                        InQuotes = !InQuotes;
+                        buf.push_back(ch);
+                    }
+                    else if (ch == '\"' && next_ch == '\n' && InQuotes){
+                        buf.push_back(ch);
+                        DataSource->Get(next_ch);
+                        break;
+                    }
+                    else if (ch == '\n' && !InQuotes){
+                        break;
+                    }
+                    else if (ch == '\r' && !InQuotes){
                         if (DataSource->Peek(next_ch)){
-                            if (next_ch == '\n') {
+                            if (next_ch == '\n'){
                                 DataSource->Get(next_ch);
                             }
                         }
                         break;
                     }
+                    else{
+                        buf.push_back(ch);
+                    }
                 }
-                // If the character is a newline character and not in quotes, break
-                if (ch == '\n' && !InQuotes){
-                    break;
-                } 
-            };
-            // This works because we're making a copy of the character to add to buf
-            buf.push_back(ch);
+            }
+            // std::string data(buf.begin(), buf.end());
+            // std::cout << "buf: " << data << std::endl;
         }
+                    
         // Define a string variable to store the data read from the data source
         std::string data(buf.begin(), buf.end());
-        std::cout << "Data: " << data << std::endl;
+        // std::cout << "Data: " << data << std::endl;
         SplitRow(row, data, Delimiter);
         return true;
     }
