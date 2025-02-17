@@ -114,13 +114,13 @@ obj/XMLTest.o: testsrc/XMLTest.cpp | obj
 	g++ -Iinclude -Wall -Wextra -std=c++17 -o obj/XMLTest.o -c testsrc/XMLTest.cpp
 
 teststrutils: obj/StringUtils.o obj/StringUtilsTest.o
-	g++ -Wall -Wextra obj/StringUtils.o obj/StringUtilsTest.o -o teststrutils -lgtest -lgtest_main
+	g++ -Wall -Wextra obj/StringUtils.o obj/StringUtilsTest.o -o teststrutils -lgtest -lgtest_main -lexpat
 
 teststrdatasource: obj/StringDataSource.o obj/StringDataSourceTest.o
-	g++ -Wall -Wextra obj/StringDataSource.o obj/StringDataSourceTest.o -o teststrdatasource -lgtest -lgtest_main
+	g++ -Wall -Wextra obj/StringDataSource.o obj/StringDataSourceTest.o -o teststrdatasource -lgtest -lgtest_main -lexpat
 
 teststrdatasink: obj/StringDataSink.o obj/StringDataSinkTest.o
-	g++ -Wall -Wextra obj/StringDataSink.o obj/StringDataSinkTest.o -o teststrdatasink -lgtest -lgtest_main
+	g++ -Wall -Wextra obj/StringDataSink.o obj/StringDataSinkTest.o -o teststrdatasink -lgtest -lgtest_main -lexpat
 
 testdsv: obj/DSVReader.o obj/DSVWriter.o obj/DSVTest.o obj/StringUtils.o obj/StringDataSource.o obj/StringDataSink.o
 	g++ -Wall -Wextra obj/DSVReader.o obj/DSVWriter.o obj/DSVTest.o obj/StringUtils.o obj/StringDataSource.o obj/StringDataSink.o -o testdsv -lgtest -lgtest_main

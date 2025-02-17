@@ -64,7 +64,7 @@ struct CXMLReader::SImplementation {
             }
         }
         XML_Parse(DParser, nullptr, 0, XML_TRUE); // Finalize parsing
-        return false;
+        return true;
     }
 };
 
