@@ -25,9 +25,7 @@ struct CDSVReader::SImplementation {
                 if (row[i].back() != '\"') {
                     return false; // Mismatched quotes
                 }
-                // Remove the surrounding quotes
                 row[i] = row[i].substr(1, row[i].size() - 2);
-                // Replace escaped quotes ("") with a single quote (")
                 row[i] = StringUtils::Replace(row[i], "\"\"", "\"");
             }
         }
@@ -96,21 +94,6 @@ struct CDSVReader::SImplementation {
             return false;
         }
     
-        return true;
-    }
-
-        size_t NewlinePos = AccumulatedData.find('\n');
-        std::string CurrentRow = AccumulatedData.substr(0, NewlinePos);
-        if (NewlinePos != std::string::npos) {
-            Leftover.push_back(AccumulatedData.substr(NewlinePos + 1));
-        }
-
-        row = SplitRow(CurrentRow, Delimiter);
-
-        if (!CheckSpecialCase(row)) {
-            return false;
-        }
-
         return true;
     }
 };
