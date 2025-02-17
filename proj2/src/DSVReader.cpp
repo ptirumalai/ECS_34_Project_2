@@ -25,7 +25,9 @@ struct CDSVReader::SImplementation {
                 if (row[i].back() != '\"') {
                     return false; // Mismatched quotes
                 }
+                // Remove the surrounding quotes
                 row[i] = row[i].substr(1, row[i].size() - 2);
+                // Replace escaped quotes ("") with a single quote (")
                 row[i] = StringUtils::Replace(row[i], "\"\"", "\"");
             }
         }
@@ -57,13 +59,13 @@ struct CDSVReader::SImplementation {
 
     bool ReadRow(std::vector<std::string>& row) {
         row.clear();
-
+    
         std::string AccumulatedData;
         if (!Leftover.empty()) {
             AccumulatedData = Leftover[0];
             Leftover.clear();
         }
-
+    
         while (true) {
             std::vector<char> Buffer;
             std::size_t BufferSize = 256;
@@ -73,14 +75,29 @@ struct CDSVReader::SImplementation {
                 }
                 break;
             }
-
+    
             AccumulatedData += std::string(Buffer.begin(), Buffer.end());
-
+    
             size_t NewlinePos = AccumulatedData.find('\n');
             if (NewlinePos != std::string::npos) {
                 break;
             }
         }
+    
+        size_t NewlinePos = AccumulatedData.find('\n');
+        std::string CurrentRow = AccumulatedData.substr(0, NewlinePos);
+        if (NewlinePos != std::string::npos) {
+            Leftover.push_back(AccumulatedData.substr(NewlinePos + 1));
+        }
+    
+        row = SplitRow(CurrentRow, Delimiter);
+    
+        if (!CheckSpecialCase(row)) {
+            return false;
+        }
+    
+        return true;
+    }
 
         size_t NewlinePos = AccumulatedData.find('\n');
         std::string CurrentRow = AccumulatedData.substr(0, NewlinePos);
