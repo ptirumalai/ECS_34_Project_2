@@ -64,12 +64,16 @@ std::string Strip(const std::string &str) noexcept{
     return LStrip(RStrip(str));
 }
 
-std::string Center(const std::string &str, int width, char fill) noexcept {
-    if (str.length() >= width) {
+std::string Center(const std::string &str, int width, char fill) noexcept{
+    int len = str.length();
+    int num_fill = width - len;
+    if (num_fill > 0){
+        int left_fill = num_fill / 2;
+        int right_fill = num_fill - left_fill;
+        return std::string(left_fill, fill) + str + std::string(right_fill, fill);
+    } else {
         return str;
     }
-    size_t padding = (width - str.length()) / 2;
-    return std::string(padding, fill) + str + std::string(width - str.length() - padding, fill);
 }
 
 std::string LJust(const std::string &str, int width, char fill) noexcept {
@@ -127,30 +131,18 @@ std::string Join(const std::string &str, const std::vector< std::string > &vect)
     return result;
 }
 
-std::string ExpandTabs(const std::string &str, int tabsize) noexcept {
-  std::string new_str = "";
-  if (tabsize < 0) tabsize = 0; // Edge case
-  int position = 0;
-  for (auto c : str) {
-    if (c == '\t') {
-      if (tabsize != 0 && position % tabsize == 0) {
-        for (int i = 0; i < tabsize; i++) { // Edge case
-          new_str.append(" ");
-          position++;
+std::string ExpandTabs(const std::string &str, int tabsize) noexcept{
+    std::string outstring;
+    for (char c : str){
+        if (!(c == '\t')){
+            outstring += c;
+        } else {
+            int curr_len = outstring.length();
+            int num_spaces = tabsize - (outstring.length() % tabsize);
+            outstring += std::string(num_spaces, ' ');
         }
-      }
-
-      while (tabsize != 0 && (position) % tabsize != 0) {
-        new_str.append(" ");
-        position++;
-      }
-    } else {
-      new_str.append(std::string(1,c));
-      position++;
     }
-  }
-
-  return new_str;
+    return outstring;   
 }
 
 int EditDistance(const std::string &left, const std::string &right, bool ignorecase) noexcept{

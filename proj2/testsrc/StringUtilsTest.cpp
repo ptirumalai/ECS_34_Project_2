@@ -69,9 +69,11 @@ TEST(StringUtilsTest, Join) {
     EXPECT_EQ(StringUtils::Join("-", input), "hello-world");
 }
 
-TEST(StringUtilsTest, ExpandTabs) {
-    EXPECT_EQ(StringUtils::ExpandTabs("\thello\tworld", 4), "    hello    world");
-    EXPECT_EQ(StringUtils::ExpandTabs("a\tb\tc", 2), "a  b  c");
+TEST(ExpandTabsTests, AllExpanding){
+    std::string str = "This\tis\tmy\tfirst\tECS\t34\tProject";
+    EXPECT_EQ(StringUtils::ExpandTabs(str), "This    is  my  first   ECS 34  Project");
+    EXPECT_EQ(StringUtils::ExpandTabs(str, 8), "This    is      my      first   ECS     34      Project");
+    EXPECT_EQ(StringUtils::ExpandTabs(str, 12), "This        is          my          first       ECS         34          Project");
 }
 
 TEST(StringUtilsTest, EditDistance) {
