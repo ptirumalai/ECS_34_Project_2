@@ -63,9 +63,13 @@ struct CXMLReader::SImplementation {
         impl->DEntityQueue.push(newEntity);
     }
 
-    bool GetLatestEntity(SXMLEntity& entity) {  
+    bool GetLatestEntity(SXMLEntity& entity, bool skipcdata) {  
         if (DEntityQueue.size() > 0) {
-            entity = DEntityQueue.front();
+            SXMLEntity tmp = DEntityQueue.front();
+            if (skipcdata && entity.DType == SXMLEntity::EType::CharData) {
+                return false;
+            }
+            entity = tmp;
             DEntityQueue.pop();
             return true;
         }
@@ -80,17 +84,12 @@ struct CXMLReader::SImplementation {
                 std::string content = std::string(Buffer.data(), Buffer.size());
                 // std::cout << "Buffer: " << content << std::endl;
                 if (!XML_Parse(DParser, Buffer.data(), Buffer.size(), XML_FALSE)) {
-                    // Handle parsing error
-                    XML_Error errorCode = XML_GetErrorCode(DParser);
-                    const char *errorString = XML_ErrorString(errorCode);
-                    // Log or handle the error
-                    // std::cout << "Error: " << errorString << std::endl;
                     break;
                 }  
             }
         }
         XML_Parse(DParser, nullptr, 0, XML_TRUE);
-        return GetLatestEntity(entity);
+        return GetLatestEntity(entity, skipcdata);
     }
 };
 
