@@ -71,17 +71,21 @@ struct CDSVReader::SImplementation {
                     else if (ch == '\n' && !InQuotes){
                         break;
                     }
-                    else if (ch == '\r' && !InQuotes){
-                        if (DataSource->Peek(next_ch)){
+                    else if (ch == '\r' && !InQuotes) {
+                        if (DataSource->Peek(next_ch)) {
                             if (next_ch == '\n'){
                                 DataSource->Get(next_ch);
                             }
                         }
                         break;
                     }
-                    else{
+                    else {
                         buf.push_back(ch);
                     }
+                } 
+                else {
+                    buf.push_back(ch);
+                    break;
                 }
             }
             // std::string data(buf.begin(), buf.end());
