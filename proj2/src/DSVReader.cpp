@@ -27,7 +27,7 @@ struct CDSVReader::SImplementation {
             char next_ch = (i + 1) < content.size() ? content[i + 1] : '\0';
             if (ch == '\"' && next_ch != '\"') {    
                 InQuotes = !InQuotes;
-                // Field += ch;
+                Field += ch;
             } else if (InQuotes && ch == '\"' && next_ch == '\"') {
                 Field += ch;
                 i++;
