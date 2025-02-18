@@ -131,19 +131,38 @@ std::string Join(const std::string &str, const std::vector< std::string > &vect)
     return result;
 }
 
-std::string ExpandTabs(const std::string &str, int tabsize) noexcept{
-    std::string outstring;
-    for (char c : str){
-        if (!(c == '\t')){
-            outstring += c;
-        } else {
-            int curr_len = outstring.length();
-            int num_spaces = tabsize - (outstring.length() % tabsize);
-            outstring += std::string(num_spaces, ' ');
+std::string ExpandTabs(const std::string &str, int tabsize) noexcept
+    {
+        std::string outstring;
+        // If tabsize is less than 1, then just remove the tabs
+        if (tabsize < 1)
+        {
+            for (char c : str)
+            {
+                if (!(c == '\t'))
+                {
+                    outstring += c;
+                }
+            }
+            return outstring;
         }
+        // Otherwise, replace the tabs with spaces
+        for (char c : str)
+        {
+            if (!(c == '\t'))
+            {
+                outstring += c;
+            }
+            else
+            {
+                int curr_len = outstring.length();
+                // Calculate the number of spaces needed to reach the next tabstop for alignment
+                int num_spaces = tabsize - (outstring.length() % tabsize);
+                outstring += std::string(num_spaces, ' ');
+            }
+        }
+        return outstring;
     }
-    return outstring;   
-}
 
 int EditDistance(const std::string &left, const std::string &right, bool ignorecase) noexcept{
     std::string l = ignorecase ? Lower(left) : left;
