@@ -27,7 +27,7 @@ struct CXMLReader::SImplementation {
     }
 
     static void StartElementHandler(void *userData, const XML_Char *name, const XML_Char **atts) {
-        std::cout << "Element started" << std::endl;
+        // std::cout << "Element started" << std::endl;
         SXMLEntity newEntity;
         auto impl = static_cast<SImplementation*>(userData);
         newEntity.DType = SXMLEntity::EType::StartElement;
@@ -45,7 +45,7 @@ struct CXMLReader::SImplementation {
     }
 
     static void EndElementHandler(void *userData, const XML_Char *name) {
-        std::cout << "Element ended" << std::endl;
+        // std::cout << "Element ended" << std::endl;
         SXMLEntity newEntity;
         auto impl = static_cast<SImplementation*>(userData);
         newEntity.DType = SXMLEntity::EType::EndElement;
@@ -55,7 +55,7 @@ struct CXMLReader::SImplementation {
 
     static void CharacterDataHandler(void *userData, const XML_Char *s, int len) {
         std::string content = std::string(s, len);
-        std::cout << content << std::endl;
+        // std::cout << content << std::endl;
         SXMLEntity newEntity;
         auto impl = static_cast<SImplementation*>(userData);
         newEntity.DType = SXMLEntity::EType::CharData;
@@ -78,13 +78,13 @@ struct CXMLReader::SImplementation {
         while (!DSource->End()) {
             if (DSource->Read(Buffer, bufferSize)) {
                 std::string content = std::string(Buffer.data(), Buffer.size());
-                std::cout << "Buffer: " << content << std::endl;
+                // std::cout << "Buffer: " << content << std::endl;
                 if (!XML_Parse(DParser, Buffer.data(), Buffer.size(), XML_FALSE)) {
                     // Handle parsing error
                     XML_Error errorCode = XML_GetErrorCode(DParser);
                     const char *errorString = XML_ErrorString(errorCode);
                     // Log or handle the error
-                    std::cout << "Error: " << errorString << std::endl;
+                    // std::cout << "Error: " << errorString << std::endl;
                     break;
                 }  
             }
