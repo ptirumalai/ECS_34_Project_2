@@ -45,6 +45,26 @@ bool CXMLWriter::Flush() {
     return true;
 }
 
+std::string HandleEscapeSequences(std::string str) {
+    std::string result;
+    for (size_t i = 0; i < str.size(); i++) {
+        if (str[i] == '&') {
+            result += "&amp;";
+        } else if (str[i] == '<') {
+            result += "&lt;";
+        } else if (str[i] == '>') {
+            result += "&gt;";
+        } else if (str[i] == '"') {
+            result += "&quot;";
+        } else if (str[i] == '\'') {
+            result += "&apos;";
+        } else {
+            result += str[i];
+        }
+    }
+    return result;
+}
+
 // Write an XML entity to the data sink
 bool CXMLWriter::WriteEntity(const SXMLEntity& entity) {
     switch (entity.DType) {
@@ -56,7 +76,7 @@ bool CXMLWriter::WriteEntity(const SXMLEntity& entity) {
                 DImplementation->WriteString(Attr.first);
                 DImplementation->WriteChar('=');
                 DImplementation->WriteChar('"');
-                DImplementation->WriteString(Attr.second);
+                DImplementation->WriteString(HandleEscapeSequences(Attr.second));
                 DImplementation->WriteChar('"');
             }
             DImplementation->WriteChar('>');
