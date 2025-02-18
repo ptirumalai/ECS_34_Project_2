@@ -65,6 +65,11 @@ struct CXMLReader::SImplementation {
 
     bool GetLatestEntity(SXMLEntity& entity, bool skipcdata) {  
         if (DEntityQueue.size() > 0) {
+            if (skipcdata) {
+                while (DEntityQueue.front().DType == SXMLEntity::EType::CharData) {
+                    DEntityQueue.pop();
+                }
+            }
             entity = DEntityQueue.front();
             DEntityQueue.pop();
             return true;

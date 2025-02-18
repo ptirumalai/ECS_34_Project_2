@@ -104,7 +104,7 @@ bool CXMLWriter::WriteEntity(const SXMLEntity& entity) {
             break;
 
         case SXMLEntity::EType::CharData:
-            DImplementation->WriteString(entity.DNameData);
+            DImplementation->WriteString(HandleEscapeSequences(entity.DNameData));
             break;
     }
     return true;
