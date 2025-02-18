@@ -4,6 +4,7 @@
 #include <memory>
 #include "XMLEntity.h"
 #include "DataSource.h"
+#include <queue>
 
 class CXMLReader{
     private:

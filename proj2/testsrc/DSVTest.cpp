@@ -68,6 +68,18 @@ TEST(CDSVReader, ReadRowWithQuotesTest) {
     EXPECT_EQ(Row[2], "value\n3");
 }
 
+// TEST(CDSVReader, ReadQuoteBetweenQuotesTest) {
+//     std::string Input = "\"...\"...\",abc\n";
+//     auto Source = std::make_shared<CStringDataSource>(Input);
+//     CDSVReader Reader(Source, ',');
+
+//     std::vector<std::string> Row;
+//     EXPECT_TRUE(Reader.ReadRow(Row));
+//     EXPECT_EQ(Row.size(), size_t(2));
+//     EXPECT_EQ(Row[0], "...\"...");
+//     EXPECT_EQ(Row[1], "abc");
+// }
+
 TEST(CDSVReader, ReadEmptyRowTest) {
     std::string Input = "\n";
     auto Source = std::make_shared<CStringDataSource>(Input);

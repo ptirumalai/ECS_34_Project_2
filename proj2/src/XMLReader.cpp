@@ -1,22 +1,25 @@
 #include "XMLReader.h"
 #include "StringUtils.h"
+#include "XMLEntity.h"
 #include <memory>
 #include <vector>
 #include <string>
 #include <expat.h>
+#include <iostream>
+#include <queue>
+#include <cstring>
 
 struct CXMLReader::SImplementation {
     std::shared_ptr<CDataSource> DSource;
     XML_Parser DParser;
-    SXMLEntity DCurrentEntity;
-    bool DHasEntity;
+    std::queue<SXMLEntity> DEntityQueue;
 
-    SImplementation(std::shared_ptr<CDataSource> src)
-        : DSource(src), DHasEntity(false) {
+    SImplementation(std::shared_ptr<CDataSource> src) : DSource(src) {
         DParser = XML_ParserCreate(nullptr);
         XML_SetUserData(DParser, this);
         XML_SetElementHandler(DParser, StartElementHandler, EndElementHandler);
         XML_SetCharacterDataHandler(DParser, CharacterDataHandler);
+        DEntityQueue = std::queue<SXMLEntity>();
     }
 
     ~SImplementation() {
@@ -24,47 +27,70 @@ struct CXMLReader::SImplementation {
     }
 
     static void StartElementHandler(void *userData, const XML_Char *name, const XML_Char **atts) {
-        SImplementation *impl = static_cast<SImplementation*>(userData);
-        impl->DCurrentEntity.DType = SXMLEntity::EType::StartElement;
-        impl->DCurrentEntity.DNameData = name;
-        impl->DHasEntity = true;
+        std::cout << "Element started" << std::endl;
+        SXMLEntity newEntity;
+        auto impl = static_cast<SImplementation*>(userData);
+        newEntity.DType = SXMLEntity::EType::StartElement;
+        newEntity.DNameData = name;
+        newEntity.DAttributes = std::vector<std::pair<std::string, std::string>>();
+        for (int i = 0; atts[i]; i += 2) {
+            char* namePtr = (char*) atts[i];
+            char* valuePtr = (char*) atts[i + 1];
+            std::string name = std::string(namePtr, strlen(namePtr));
+            std::string value = std::string(valuePtr, strlen(valuePtr));
+
+            newEntity.DAttributes.push_back(std::make_pair(name, value));
+        }
+        impl->DEntityQueue.push(newEntity);
     }
 
     static void EndElementHandler(void *userData, const XML_Char *name) {
-        SImplementation *impl = static_cast<SImplementation*>(userData);
-        impl->DCurrentEntity.DType = SXMLEntity::EType::EndElement;
-        impl->DCurrentEntity.DNameData = name;
-        impl->DHasEntity = true;
+        std::cout << "Element ended" << std::endl;
+        SXMLEntity newEntity;
+        auto impl = static_cast<SImplementation*>(userData);
+        newEntity.DType = SXMLEntity::EType::EndElement;
+        newEntity.DNameData = name;
+        impl->DEntityQueue.push(newEntity);
     }
 
     static void CharacterDataHandler(void *userData, const XML_Char *s, int len) {
-        SImplementation *impl = static_cast<SImplementation*>(userData);
-        impl->DCurrentEntity.DType = SXMLEntity::EType::CharData;
-        impl->DCurrentEntity.DNameData = std::string(s, len);
-        impl->DHasEntity = true;
+        std::string content = std::string(s, len);
+        std::cout << content << std::endl;
+        SXMLEntity newEntity;
+        auto impl = static_cast<SImplementation*>(userData);
+        newEntity.DType = SXMLEntity::EType::CharData;
+        newEntity.DNameData = std::string(s, len);
+        impl->DEntityQueue.push(newEntity);
+    }
+
+    bool GetLatestEntity(SXMLEntity& entity) {  
+        if (DEntityQueue.size() > 0) {
+            entity = DEntityQueue.front();
+            DEntityQueue.pop();
+            return true;
+        }
+        return false;
     }
 
     bool ReadEntity(SXMLEntity& entity, bool skipcdata) {
-        std::vector<char> Buffer(1024); // Use a vector for the buffer
+        size_t bufferSize = 1024;
+        std::vector<char> Buffer(bufferSize);
         while (!DSource->End()) {
-            size_t BytesRead = DSource->Read(Buffer, Buffer.size()); // Pass the vector to Read
-            if (BytesRead > 0) {
-                if (!XML_Parse(DParser, Buffer.data(), BytesRead, XML_FALSE)) {
+            if (DSource->Read(Buffer, bufferSize)) {
+                std::string content = std::string(Buffer.data(), Buffer.size());
+                std::cout << "Buffer: " << content << std::endl;
+                if (!XML_Parse(DParser, Buffer.data(), Buffer.size(), XML_FALSE)) {
                     // Handle parsing error
                     XML_Error errorCode = XML_GetErrorCode(DParser);
                     const char *errorString = XML_ErrorString(errorCode);
                     // Log or handle the error
-                    return false;
-                }
-                if (DHasEntity) {
-                    entity = DCurrentEntity;
-                    DHasEntity = false;
-                    return true;
-                }
+                    std::cout << "Error: " << errorString << std::endl;
+                    break;
+                }  
             }
         }
-        XML_Parse(DParser, nullptr, 0, XML_TRUE); // Finalize parsing
-        return true;
+        XML_Parse(DParser, nullptr, 0, XML_TRUE);
+        return GetLatestEntity(entity);
     }
 };
 
