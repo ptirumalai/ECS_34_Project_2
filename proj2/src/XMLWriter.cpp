@@ -100,7 +100,7 @@ bool CXMLWriter::WriteEntity(const SXMLEntity& entity) {
                 DImplementation->WriteString(Attr.second);
                 DImplementation->WriteChar('"');
             }
-            DImplementation->WriteString(" />");
+            DImplementation->WriteString("/>");
             break;
 
         case SXMLEntity::EType::CharData:
