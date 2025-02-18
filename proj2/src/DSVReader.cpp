@@ -71,27 +71,32 @@ struct CDSVReader::SImplementation {
                     else if (ch == '\n' && !InQuotes){
                         break;
                     }
-                    else if (ch == '\r' && !InQuotes){
-                        if (DataSource->Peek(next_ch)){
+                    else if (ch == '\r' && !InQuotes) {
+                        if (DataSource->Peek(next_ch)) {
                             if (next_ch == '\n'){
                                 DataSource->Get(next_ch);
                             }
                         }
                         break;
                     }
-                    else{
+                    else {
                         buf.push_back(ch);
                     }
+                } 
+                else {
+                    buf.push_back(ch);
+                    break;
                 }
             }
             // std::string data(buf.begin(), buf.end());
             // std::cout << "buf: " << data << std::endl;
         }
                     
-        // Define a string variable to store the data read from the data source
-        std::string data(buf.begin(), buf.end());
-        // std::cout << "Data: " << data << std::endl;
-        SplitRow(row, data, Delimiter);
+        // Process any remaining characters in the buffer
+        if (!buf.empty()) {
+            std::string data(buf.begin(), buf.end());
+            SplitRow(row, data, Delimiter);
+        }
         return !row.empty();
     }
 };

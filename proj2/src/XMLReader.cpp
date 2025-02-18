@@ -38,7 +38,6 @@ struct CXMLReader::SImplementation {
             char* valuePtr = (char*) atts[i + 1];
             std::string name = std::string(namePtr, strlen(namePtr));
             std::string value = std::string(valuePtr, strlen(valuePtr));
-
             newEntity.DAttributes.push_back(std::make_pair(name, value));
         }
         impl->DEntityQueue.push(newEntity);
@@ -55,7 +54,6 @@ struct CXMLReader::SImplementation {
 
     static void CharacterDataHandler(void *userData, const XML_Char *s, int len) {
         std::string content = std::string(s, len);
-        // std::cout << content << std::endl;
         SXMLEntity newEntity;
         auto impl = static_cast<SImplementation*>(userData);
         newEntity.DType = SXMLEntity::EType::CharData;
