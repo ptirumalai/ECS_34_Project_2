@@ -92,10 +92,11 @@ struct CDSVReader::SImplementation {
             // std::cout << "buf: " << data << std::endl;
         }
                     
-        // Define a string variable to store the data read from the data source
-        std::string data(buf.begin(), buf.end());
-        // std::cout << "Data: " << data << std::endl;
-        SplitRow(row, data, Delimiter);
+        // Process any remaining characters in the buffer
+        if (!buf.empty()) {
+            std::string data(buf.begin(), buf.end());
+            SplitRow(row, data, Delimiter);
+        }
         return !row.empty();
     }
 };
