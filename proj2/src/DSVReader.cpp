@@ -25,12 +25,11 @@ struct CDSVReader::SImplementation {
             char ch = content[i];
             // Account for being at the end of the row
             char next_ch = (i + 1) < content.size() ? content[i + 1] : '\0';
-            if (ch == '\"' && next_ch != '\"') {    
-                InQuotes = !InQuotes;
-                // Field += ch;
-            } else if (InQuotes && ch == '\"' && next_ch == '\"') {
+            if (ch == '\"' && next_ch == '\"' && next_ch != '\0') {    
                 Field += ch;
                 i++;
+            } else if (ch == '\"') {
+                InQuotes = !InQuotes;
             } else if (ch == delimiter && !InQuotes) {
                 row.push_back(Field);
                 Field.clear();
@@ -55,18 +54,14 @@ struct CDSVReader::SImplementation {
         while(!End()){
             if (DataSource->Get(ch)){
                 if (DataSource->Peek(next_ch)){    
-                    if (ch == '\"' && !InQuotes){
-                        InQuotes = !InQuotes;
-                        buf.push_back(ch);
-                    }
-                    else if (ch == '\"' && next_ch == Delimiter && InQuotes){
-                        InQuotes = !InQuotes;
-                        buf.push_back(ch);
-                    }
-                    else if (InQuotes && ch == '\"' && (next_ch == '\n' || next_ch == '\r')){
+                    if (ch == '\"' && next_ch == '\"'){
                         buf.push_back(ch);
                         DataSource->Get(next_ch);
-                        break;
+                        buf.push_back(next_ch);
+                    }
+                    else if (ch == '\"' && next_ch != '\"'){
+                        InQuotes = !InQuotes;
+                        buf.push_back(ch);
                     }
                     else if (ch == '\n' && !InQuotes){
                         break;
@@ -83,7 +78,7 @@ struct CDSVReader::SImplementation {
                         buf.push_back(ch);
                     }
                 } 
-                else {
+                else if (ch != '\n' && ch != '\r'){
                     buf.push_back(ch);
                     break;
                 }
