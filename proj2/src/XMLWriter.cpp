@@ -24,6 +24,8 @@ struct CXMLWriter::SImplementation {
     }
 };
 
+// test
+
 // CXMLWriter constructor
 CXMLWriter::CXMLWriter(std::shared_ptr<CDataSink> sink)
     : DImplementation(std::make_unique<SImplementation>(sink)) {}
