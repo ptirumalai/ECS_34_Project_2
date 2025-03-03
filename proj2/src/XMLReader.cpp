@@ -9,6 +9,8 @@
 #include <queue>
 #include <cstring>
 
+// test
+
 struct CXMLReader::SImplementation {
     std::shared_ptr<CDataSource> DSource;
     XML_Parser DParser;
